@@ -632,6 +632,11 @@ public class GhidrathonInterpreter {
 
     } catch (JepException e) {
 
+      // Check for custom Python-side exception `InterpreterExit`
+      if (e.getMessage() != null && e.getMessage().contains("InterpreterExit")) {
+        throw new ghidrathon.GhidrathonInterpreterExitException();  // Throw signal Java-side
+      }
+
       // Python exceptions should be handled in Python land; something bad must have happened
       e.printStackTrace(this.err);
       throw new RuntimeException(e);
