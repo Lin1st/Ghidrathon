@@ -159,6 +159,31 @@ public class GhidrathonPlugin extends ProgramPlugin
     inputThread.start();
   }
 
+  void shutdownInterpreter() {
+    if (inputThread != null) {
+        inputThread.dispose();
+        inputThread = null;
+    }
+
+    if (console != null) {
+        console.dispose();
+        console = null;
+    }
+
+    interactiveScript = null;
+    interactiveTaskMonitor = null;
+
+    // Recreate a new console instance, so Ghidra re-registers it
+    SwingUtilities.invokeLater(() -> {
+        console = getTool()
+            .getService(InterpreterPanelService.class)
+            .createInterpreterPanel(this, false);
+
+        // Let user activate manually
+        console.addFirstActivationCallback(() -> resetInterpreter());
+    });
+  }
+
   class PythonInteractiveTaskMonitor extends TaskMonitorAdapter {
 
     private PrintWriter output = null;
