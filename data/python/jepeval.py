@@ -14,6 +14,10 @@ gives us better control over handling multi-line statements
 
 jepeval_lines = []
 
+class InterpreterExit(Exception):
+    """Signal to Java that the interpreter should exit"""
+    pass
+
 
 def jepeval(line):
     """attempt to compile and eval a given Python statement
@@ -73,7 +77,8 @@ def jepeval(line):
     try:
         more_input_needed = _jepeval(line)
     except SystemExit as err:
-        more_input_needed = False
+        raise InterpreterExit()
+        # more_input_needed = False
     except Exception as err:
         # Python exceptions are printed in Python instead of Java to improve error messaging
         # in the Ghidra console window
