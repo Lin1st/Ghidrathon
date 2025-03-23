@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingUtilities;
 
 public class GhidrathonConsoleInputThread extends Thread {
 
@@ -159,6 +160,13 @@ public class GhidrathonConsoleInputThread extends Thread {
           new PrintWriter(console.getStdOut()));
 
       status = python.eval(line, interactiveScript);
+    } catch (GhidrathonInterpreterExitException e) {
+      // Gracefully shut down only the interpreter
+      dispose();  // Stop the input thread
+      SwingUtilities.invokeLater(() -> {
+        plugin.shutdownInterpreter();
+      });
+      return false;
     } finally {
       interactiveScript.end(false);
     }
